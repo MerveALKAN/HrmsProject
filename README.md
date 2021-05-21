@@ -1,6 +1,7 @@
 # HrmsProject
 
-MODEL
+MODEL![HrmsDatabase](https://user-images.githubusercontent.com/62889546/119154340-bc113780-ba5a-11eb-8ad3-7d949605c945.png)
+
 
 Aşağıdaki isterlere göre veri tabanı modellemesi yapınız.
 
