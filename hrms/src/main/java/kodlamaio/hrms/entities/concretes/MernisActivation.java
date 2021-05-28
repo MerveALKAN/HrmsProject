@@ -6,30 +6,32 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 @ToString
-@Table(name="job_positions")
+@Entity
+@Table(name ="mernis_activations")
 
+	public class MernisActivation {
 
-public class JobPosition {
-@GeneratedValue (strategy = GenerationType.IDENTITY)
-@Id
-
-@Column(name = "id")
+	@Id
+	@GeneratedValue(strategy =  GenerationType.IDENTITY)
+	@Column(name = "id")
 	private int id;
-@Column(name = "title")	
-	private String title;
-
-
 	
+	
+	@NotNull
+	@Column(name = "user_id")
+	private int userId;
+	
+	@Column(name = "is_approved")
+	private boolean isApproved;
 }

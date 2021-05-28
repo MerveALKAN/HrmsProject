@@ -6,30 +6,37 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 @ToString
-@Table(name="job_positions")
+@Entity
+@Table(name = "users")
 
-
-public class JobPosition {
-@GeneratedValue (strategy = GenerationType.IDENTITY)
-@Id
-
-@Column(name = "id")
-	private int id;
-@Column(name = "title")	
-	private String title;
-
-
+	public class User {
 	
+	@Column(name = "id")
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	
+	
+	@NotBlank
+	@Email
+	@Column(name = "email")
+	private String email;
+	
+	@NotBlank
+	@Column(name = "password")
+	private String password;
+	
+
 }

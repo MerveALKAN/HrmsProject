@@ -13,36 +13,36 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import kodlamaio.hrms.business.abstracts.JobPositionService;
+import kodlamaio.hrms.business.abstracts.JobSeekerService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
-import kodlamaio.hrms.entities.concretes.JobPosition;
+import kodlamaio.hrms.entities.concretes.JobSeeker;
+import kodlamaio.hrms.entities.dtos.JobSeekerForRegisterDto;
 
 @RestController
-@RequestMapping("/api/jobpositions")
-public class JobPositionsController {
-	private final JobPositionService jobPositionService;
+@RequestMapping("/api/jobseekers")
+public class JobSeekersController {
+	private final JobSeekerService jobSeekerService;
 
 	@Autowired
-	public JobPositionsController(final JobPositionService jobPositionService) {
-		this.jobPositionService = jobPositionService;
+	public JobSeekersController(final JobSeekerService jobSeekerService) {
+		this.jobSeekerService = jobSeekerService;
 	}
 
 	@GetMapping("/getall")
-	public ResponseEntity<DataResult<List<JobPosition>>> getAll() {
-		final DataResult<List<JobPosition>> result = jobPositionService.getAll();
+	public ResponseEntity<DataResult<List<JobSeeker>>> getAll() {
+		final DataResult<List<JobSeeker>> result = jobSeekerService.getAll();
 
 		return ResponseEntity.ok(result);
 	}
 
-	@PostMapping("/add")
-	public ResponseEntity<Result> getAll(@Valid @RequestBody final JobPosition jobPosition) {
-		final Result result = jobPositionService.add(jobPosition);
+	@PostMapping("/register")
+	public ResponseEntity<Result> register(@Valid @RequestBody final JobSeekerForRegisterDto jobSeekerForRegisterDto) {
+		final Result result = jobSeekerService.register(jobSeekerForRegisterDto);
 
 		if (!result.isSuccess())
 			return new ResponseEntity<Result>(result, HttpStatus.BAD_REQUEST);
 
 		return ResponseEntity.ok(result);
 	}
-
 }
