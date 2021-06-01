@@ -21,7 +21,7 @@ import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.EmployerDao;
 import kodlamaio.hrms.entities.concretes.CompanyStaffVerification;
 import kodlamaio.hrms.entities.concretes.Employer;
-import kodlamaio.hrms.entities.concretes.User;
+import kodlamaio.hrms.core.entities.User;
 import kodlamaio.hrms.entities.dtos.EmployerForRegisterDto;
 
 @Service
@@ -77,38 +77,35 @@ public class EmployerManager implements EmployerService {
 		return email.split("@")[1].equals(website) ? new SuccessResult() : new ErrorResult(Messages.emailNotCorporate);
 	}
 
-	private Result isCorporateEmailExist(final String corporateEmail) {
-		return !employerDao.findByCorporateEmail(corporateEmail).isEmpty() ? new SuccessResult()
+	@Override
+	public Result isNotCorporateEmailExist(final String corporateEmail) {
+		return employerDao.findByCorporateEmail(corporateEmail).isEmpty() ? new SuccessResult()
 				: new ErrorResult(Messages.employerWithCorporateEmailAlreadyExits);
 	}
 
 	@Override
 	public Result register(final EmployerForRegisterDto employerForRegister) {
 		final Result businessRulesResult = BusinessRules.run(
-				isCorporateEmailExist(employerForRegister.getCorporateEmail()),
+				userService.isNotEmailExist(employerForRegister.getEmail()),
+				isNotCorporateEmailExist(employerForRegister.getCorporateEmail()),
 				arePasswordMatch(employerForRegister.getPassword(), employerForRegister.getConfirmPassword()),
 				isCorporateEmail(employerForRegister.getCorporateEmail(), employerForRegister.getWebsite()));
 		if (!businessRulesResult.isSuccess())
 			return businessRulesResult;
 
-		final User user = new User(0, employerForRegister.getEmail(), employerForRegister.getPassword());
-		final Result userRegisterResult = userService.register(user);
-		if (!userRegisterResult.isSuccess())
-			return userRegisterResult;
-
-		final Employer employer = new Employer(user.getId(),
-				employerForRegister.getCompanyName(),
-				employerForRegister.getWebsite(),
-				employerForRegister.getCorporateEmail(),
-				employerForRegister.getPhone());
+		final Employer employer = Employer.childBuilder()
+				.email(employerForRegister.getEmail())
+				.password(employerForRegister.getPassword())
+				.companyName(employerForRegister.getCompanyName())
+				.website(employerForRegister.getWebsite())
+				.corporateEmail(employerForRegister.getCorporateEmail())
+				.phone(employerForRegister.getPhone())
+				.build();
 		add(employer);
 
-		emailActivationService.createAndSendByMail(user.getId(), employer.getCorporateEmail());
-
-		final CompanyStaffVerification companyStaffVerification = new CompanyStaffVerification(0,
-				employer.getUserId(),
-				false);
-		companyStaffVerificationService.add(companyStaffVerification);
+		emailActivationService
+				.createAndSendActivationCodeByMail(employer, employer.getEmail(), employer.getCorporateEmail());
+		companyStaffVerificationService.add(CompanyStaffVerification.builder().user(employer).build());
 
 		return new SuccessResult(Messages.employerRegistered);
 	}
